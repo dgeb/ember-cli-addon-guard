@@ -23,9 +23,12 @@ In the scenario described above, the version conflict arose because of adding a 
 
 ## Solution
 
-To avoid the problems described above, `ember-cli-addon-guard` simply stops problematic builds from succeeding.
+To avoid the problems described above, you could take one of the following "manual" approaches to ensure that a single version of `ember-power-select` is used:
 
-Prior to every build, the full dependency tree is checked for duplicate addons of different versions. Any cases of addon duplication will be examined to see if the addons introduce run-time code. If a run-time duplication conflict is found, the problem will be logged in detail and a hard error will prevent the build from proceeeding until conflicts have been resolved.
+ - pin your app's `ember-power-select` dependency to an older version that uses `ember-wormhole` 0.3 (if one exists) until `ember-modal-dialog` is updated
+ - fork `ember-modal-dialog` and make whatever changes are necessary for it to work with `ember-wormhole` 0.5, then use your fork until those changes are accepted upstream
+
+If the version conflict is not resolved, `ember-cli-addon-guard` will simply stop builds that contain run-time conflicts from succeeding. Prior to every build, the full dependency tree is checked for duplicate addons of different versions. Any cases of addon duplication will be examined to see if the addons introduce run-time code. If a run-time duplication conflict is found, the problem will be logged in detail and a hard error will prevent the build from proceeding until conflicts have been resolved.
 
 ### Run-time vs. Build-time Addons
 
@@ -33,22 +36,13 @@ Some addons don't actually add files to your application tree, so they don't hav
 
 For this reason, `ember-cli-addon-guard` is only concerned with preventing multiple versions of _run-time_ dependencies from co-existing in a project. In order to determine whether an addon contains run-time code, it's checked to see if it contains `addon`, `app`, or `src` directories.
 
-### Dealing with Conflicts
-
-In the `ember-wormhole` example above, you have several options you might choose from:
-
- - pin your app's `ember-power-select` dependency to an older version that uses `ember-wormhole` 0.3 (if one exists) until `ember-modal-dialog` is updated
- - fork `ember-modal-dialog` and make whatever changes are necessary for it to work with `ember-wormhole` 0.5, then use your fork until those changes are accepted upstream
-
-Another option is also available with `ember-cli-addon-guard`: multiple versions of addons can be allowed to coexist by namespacing each of them by their version. When these addons are merged together, their names will now be unique, which should allow them to co-exist. This approach should be used with caution and well-tested, but should work with most well-behaved addons that have no concept of shared global state. In order to enable namespacing, each addon must be whitelisted (see below).
-
 ## Usage
 
 When `ember-cli-addon-guard` is added to your project, it will automatically attempt to identify and circumvent conflicts prior to every build.
 
-You can also manually run `ember addon-guard` to get a more detailed report of any problems encountered in a project.
+You can also manually run `ember addon-guard` to get a detailed report of any problems encountered in a project without performing a build.
 
-## Configuration
+### Configuration
 
 Configuration for this addon is specified in a dedicated file in your project's `config` folder. For apps, this will be `config/addon-guard.js`, and for addons, this will be the dummy app's `tests/dummy/config/addon-guard.js`.
 
@@ -64,7 +58,9 @@ module.exports = {
 };
 ```
 
-### Coming Soon
+### Coming Soon: Namespacing
+
+Another option will soon be available with `ember-cli-addon-guard`: multiple versions of addons will be allowed to coexist by namespacing each of them by their version. When these addons are merged together, their names will now be unique, which should allow them to co-exist. This approach should be used with caution and well-tested, but should work with most well-behaved addons that have no concept of shared global state. In order to enable namespacing, each addon must be explicitly opted-in via a configuration file (see below).
 
 The `namespaceAddons` option is not yet supported, but will soon allow you to opt-in to namespacing specific addons that you need to co-exist with different versions:
 
@@ -86,9 +82,9 @@ This project is based upon the excellent [ember-cli-dependency-lint](https://git
 
 * `ember-cli-addon-guard` runs before every build and strictly prevents addon dependency conflicts that have not been explicitly ignored.
 
-* `ember-cli-addon-guard` will soon provide an option to namespace specific addons in order to provide conflicts.
+* `ember-cli-addon-guard` is only concerned with addons that are built for _run-time_. This is inferred from the directories and files present in each addon.
 
-* `ember-cli-addon-guard` is only concerned with addons that are built for _run-time_. This is inferred from the directories and files present in addons.
+* `ember-cli-addon-guard` will soon provide an option to namespace specific addons in order to allow them to co-exist at run-time without conflict.
 
 ## Contributing
 
