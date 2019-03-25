@@ -2,7 +2,7 @@
 'use strict';
 
 module.exports = {
-  name: 'ember-cli-dependency-lint',
+  name: 'ember-cli-addon-guard',
 
   normalizeEntityName() {
 

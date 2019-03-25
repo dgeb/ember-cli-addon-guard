@@ -19,6 +19,8 @@
 /ember-cli-build.js
 /testem.js
 /tests/
+/tests-node/
+/package-lock.json
 /yarn.lock
 .gitkeep
 

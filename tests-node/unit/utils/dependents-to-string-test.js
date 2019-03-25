@@ -3,8 +3,8 @@ const dedent = require('../../helpers/dedent');
 
 const dependentsToString = require('../../../lib/utils/dependents-to-string');
 
-describe('dependentsToString', () => {
-  it('prints simple trees', () => {
+describe('dependentsToString', function() {
+  it('prints simple trees', function() {
     const dependents = {
       '1.0.0': [
         ['foo'],
@@ -20,7 +20,7 @@ describe('dependentsToString', () => {
     `);
   });
 
-  it('hoists the addon in question and alphabetizes the rest', () => {
+  it('hoists the addon in question and alphabetizes the rest', function() {
     const dependents = {
       '1.0.0': [
         ['root'],
@@ -50,7 +50,7 @@ describe('dependentsToString', () => {
     `);
   });
 
-  it('allows for custom formatting of the addon name', () => {
+  it('allows for custom formatting of the addon name', function() {
     const printer = version => `${version}<->${version.split('').reverse().join('')}`;
     const dependents = {
       '1.0.0': [['foo']],
