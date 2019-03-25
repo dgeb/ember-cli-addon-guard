@@ -57,12 +57,9 @@ This configuration file allows you to safelist any addons you'd like to ignore a
 ```js
 // config/addon-guard.js
 module.exports = {
-  namespaceAddons: [
-    'ember-wormhole',
-    'sparkles-component'
-  ],
   ignoreAddons: [
-    'ember-yolo'
+    'ember-yolo',
+    'ember-wat'
   ]
 };
 ```
