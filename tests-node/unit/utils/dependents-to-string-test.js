@@ -5,63 +5,83 @@ const dependentsToString = require('../../../lib/utils/dependents-to-string');
 
 describe('dependentsToString', function() {
   it('prints simple trees', function() {
-    const dependents = {
-      '1.0.0': [
-        ['foo'],
-        ['foo', 'bar'],
-      ],
+    const instances = {
+      '123456': {
+        version: '1.0.0',
+        cacheKey: '123456',
+        dependents: [
+          ['foo'],
+          ['foo', 'bar'],
+        ]
+      }
     };
 
-    expect(dependentsToString('my-addon', dependents)).to.equal(dedent`
+    expect(dependentsToString('my-addon', instances)).to.equal(dedent`
       foo
-      ├── my-addon@1.0.0
+      ├── my-addon@1.0.0 (cacheKey: 123456)
       └─┬ bar
-        └── my-addon@1.0.0
+        └── my-addon@1.0.0 (cacheKey: 123456)
     `);
   });
 
   it('hoists the addon in question and alphabetizes the rest', function() {
-    const dependents = {
-      '1.0.0': [
-        ['root'],
-        ['root', 'qqqqq'],
-        ['root', 'qqqqq', 'aaaaa'],
-      ],
-      '1.2.3': [
-        ['root', 'zzzzz'],
-        ['root', 'aaaaa'],
-        ['root', 'qqqqq', 'zzzzz'],
-      ],
+    const instances = {
+      '123456': {
+        version: '1.0.0',
+        dependents: [
+          ['root'],
+          ['root', 'qqqqq'],
+          ['root', 'qqqqq', 'aaaaa'],
+        ]
+      },
+      'abcdef': {
+        version: '1.2.3',
+        dependents: [
+          ['root', 'zzzzz'],
+          ['root', 'aaaaa'],
+          ['root', 'qqqqq', 'zzzzz'],
+        ]
+      }
     };
 
-    expect(dependentsToString('mmmmm', dependents)).to.equal(dedent`
+    expect(dependentsToString('mmmmm', instances)).to.equal(dedent`
       root
-      ├── mmmmm@1.0.0
+      ├── mmmmm@1.0.0 (cacheKey: 123456)
       ├─┬ aaaaa
-      │ └── mmmmm@1.2.3
+      │ └── mmmmm@1.2.3 (cacheKey: abcdef)
       ├─┬ qqqqq
-      │ ├── mmmmm@1.0.0
+      │ ├── mmmmm@1.0.0 (cacheKey: 123456)
       │ ├─┬ aaaaa
-      │ │ └── mmmmm@1.0.0
+      │ │ └── mmmmm@1.0.0 (cacheKey: 123456)
       │ └─┬ zzzzz
-      │   └── mmmmm@1.2.3
+      │   └── mmmmm@1.2.3 (cacheKey: abcdef)
       └─┬ zzzzz
-        └── mmmmm@1.2.3
+        └── mmmmm@1.2.3 (cacheKey: abcdef)
     `);
   });
 
   it('allows for custom formatting of the addon name', function() {
-    const printer = version => `${version}<->${version.split('').reverse().join('')}`;
-    const dependents = {
-      '1.0.0': [['foo']],
-      '2.3.4': [['foo', 'bar']],
+    const printer = (version, cacheKey) => `${version}<->${version.split('').reverse().join('')} (cacheKey: ${cacheKey})`;
+    const instances = {
+      '123456': {
+        version: '1.0.0',
+        dependents: [
+          ['foo']
+        ]
+      },
+      'abcdef': {
+        version: '2.3.4',
+        dependents: [
+          ['foo', 'bar']
+        ]
+      }
     };
 
-    expect(dependentsToString('my-addon', dependents, printer)).to.equal(dedent`
+    expect(dependentsToString('my-addon', instances, printer)).to.equal(dedent`
       foo
-      ├── 1.0.0<->0.0.1
+      ├── 1.0.0<->0.0.1 (cacheKey: 123456)
       └─┬ bar
-        └── 2.3.4<->4.3.2
+        └── 2.3.4<->4.3.2 (cacheKey: abcdef)
     `);
   });
 });

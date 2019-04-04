@@ -18,10 +18,7 @@ describe('isRuntimeAddon', function() {
         }
       };
     });
-    fixturifyProject.writeSync();
-
     const project = fixturifyProject.buildProjectModel();
-    project.initializeAddons();
 
     for (const addon of project.addons) {
       expect(isRuntimeAddon(addon)).to.be.true;
@@ -37,10 +34,7 @@ describe('isRuntimeAddon', function() {
       };
     });
     fixturifyProject.addAddon('bar', '1.2.3');
-    fixturifyProject.writeSync();
-
     const project = fixturifyProject.buildProjectModel();
-    project.initializeAddons();
 
     for (const addon of project.addons) {
       expect(isRuntimeAddon(addon)).to.be.false;
