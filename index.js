@@ -14,9 +14,13 @@ module.exports = {
   },
 
   preBuild() {
-    // see https://ember-cli.com/api/classes/Addon.html#method_preBuild
-
-    const conflicts = reviewProject(this.project, this.addonGuardConfig);
+    const config = this.addonGuardConfig;
+    const options = {
+      ignoreAddons: config.ignoreAddons || [],
+      runtimeOnly: true,
+      conflictsOnly: true
+    };
+    const conflicts = reviewProject(this.project, options);
     const conflictCount = Object.keys(conflicts).length;
 
     if (conflictCount > 0) {

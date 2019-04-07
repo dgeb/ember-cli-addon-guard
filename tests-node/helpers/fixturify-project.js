@@ -19,6 +19,19 @@ function prepareAddon(addon) {
   addon.files['index.js'] = 'module.exports = { name: require("./package").name };';
 }
 
+function assignCacheKeyForTreeToAddons(addons) {
+  for (const addon of addons) {
+    addon.cacheKeyForTree = function() {
+      if (addon.pkg.cacheKey) {
+        return addon.pkg.cacheKey;
+      } else {
+        return `${addon.pkg.name}:${addon.pkg.version}`;
+      }
+    }
+    assignCacheKeyForTreeToAddons(addon.addons);
+  }
+}
+
 module.exports = class EmberCLIFixturifyProject extends FixturifyProject {
   writeSync() {
     super.writeSync(...arguments);
@@ -34,7 +47,10 @@ module.exports = class EmberCLIFixturifyProject extends FixturifyProject {
     let cli = new MockCLI();
     let root = path.join(this.root, this.name);
 
-    return new ProjectClass(root, pkg, cli.ui, cli);
+    let project = new ProjectClass(root, pkg, cli.ui, cli);
+    project.initializeAddons();
+    assignCacheKeyForTreeToAddons(project.addons);
+    return project;
   }
 
   addAddon(name, version = '0.0.0', cb) {
@@ -75,6 +91,8 @@ module.exports = class EmberCLIFixturifyProject extends FixturifyProject {
     if (addon.paths.find(path => path.toLowerCase() === addonPath.toLowerCase())) {
       throw new Error(`project: ${this.name} already contains the in-repo-addon: ${name}`);
     }
+
+    addon.cacheKeyForTree = () => `${name}:${version}`;
 
     addon.paths.push(addonPath);
 
