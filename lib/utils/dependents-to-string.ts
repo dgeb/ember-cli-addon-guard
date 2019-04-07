@@ -1,15 +1,5 @@
 import archy from 'archy';
-
-export interface Dict<T = unknown> {
-  [key: string]: T;
-}
-
-export type path = string[];
-
-export interface AddonInstance {
-  version: string;
-  dependents: path[];
-}
+import { Dict, AddonSummary } from '../interfaces';
 
 export type Printer = (version: string, cacheKey: string) => string;
 
@@ -18,7 +8,7 @@ export type Printer = (version: string, cacheKey: string) => string;
  * and optionally a function to determine how the addon itself is printed, returns a string
  * containing a printable version of the structure.
  */
-export default function dependentsToString(name: string, instances: Dict<AddonInstance>, printer?: Printer): string {
+export default function dependentsToString(name: string, instances: Dict<AddonSummary>, printer?: Printer): string {
   const tree: any = {};
 
   for (const cacheKey of Object.keys(instances)) {

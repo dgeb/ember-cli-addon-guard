@@ -1,9 +1,10 @@
 import readConfig from './lib/utils/read-config';
-import reviewProject from './lib/utils/review-project';
+import reviewProject, { ReviewProjectOptions } from './lib/utils/review-project';
 import dependentsToString from './lib/utils/dependents-to-string';
-// import SilentError from 'silent-error';
+import { AddonGuardConfig, AddonSummary, Dict } from './lib/interfaces';
+import SilentError from 'silent-error';
 
-export default {
+module.exports = {
   name: require('./package').name,
 
   init() {
@@ -12,26 +13,38 @@ export default {
   },
 
   preBuild() {
-    const config = this.addonGuardConfig;
-    const options = {
+    const config: AddonGuardConfig = this.addonGuardConfig;
+    const options: ReviewProjectOptions = {
       ignoreAddons: config.ignoreAddons || [],
       runtimeOnly: true,
-      conflictsOnly: true
+      conflictsOnly: true,
+      skipCacheKeyDependencyCheck: config.skipCacheKeyDependencyCheck
     };
-    const conflicts = reviewProject(this.project, options);
-    const conflictCount = Object.keys(conflicts).length;
+    const summary = reviewProject(this.project, options);
+    const addons = summary.addons;
+    const conflictCount = Object.keys(addons).length;
 
-    if (conflictCount > 0) {
+    if (summary.errors.length > 0 || conflictCount > 0) {
       // TODO: clean up formatting of this message
       let description = `\nATTENTION: ember-cli-addon-guard has prevented your application from building!\n\n`;
-      description += `Your application is dependent on multiple versions of the following run-time addon(s):\n`;
 
-      for (const addon in conflicts) {
-        description += `\n${addon}\n----------------------------------------\n`;
-        description += dependentsToString(addon, conflicts[addon]);
+      description += `Please correct the following errors:\n\n`;
+
+      if (summary.errors.length > 0) {
+        description += summary.errors.join('\n\n') + '\n\n';
       }
 
-      throw new Error(description);
+      if (conflictCount > 0) {
+        description += `Your application is dependent on multiple versions of the following run-time ${ conflictCount > 1 ? 'addons' : 'addon'}:\n`;
+
+        for (const name in addons) {
+          const addonSummaries: Dict<AddonSummary> = addons[name];
+          description += `\n${name}\n----------------------------------------\n`;
+          description += dependentsToString(name, addonSummaries);
+        }
+      }
+
+      throw new SilentError(description);
     }
   },
 
