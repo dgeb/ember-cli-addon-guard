@@ -1,7 +1,5 @@
-'use strict';
-
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import fs from 'fs';
 
 /**
  * Checks if an addon has non-empty `app` or `addon` trees to determine if it
@@ -10,7 +8,7 @@ const fs = require('fs');
  * Note that dot-files (e.g. `.gitignore`) will be ignored when scanning files
  * in these directories.
  */
-module.exports = function isRuntimeAddon(addon) {
+export default function isRuntimeAddon(addon: any): boolean {
   for (const treeName of ['app', 'addon']) {
     const treePath = path.join(addon.root, (addon.treePaths && addon.treePaths[treeName]) || treeName);
     if (isPathUsed(treePath)) {
@@ -19,9 +17,9 @@ module.exports = function isRuntimeAddon(addon) {
   }
 
   return false;
-};
+}
 
-function isPathUsed(path) {
+function isPathUsed(path: string): boolean {
   if (fs.existsSync(path)) {
     let files = fs.readdirSync(path);
     for (let file of files) {
@@ -30,4 +28,6 @@ function isPathUsed(path) {
       }
     }
   }
+
+  return false;
 }

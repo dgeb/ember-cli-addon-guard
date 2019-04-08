@@ -1,6 +1,4 @@
-'use strict';
-
-const isRuntimeAddon = require('./is-runtime-addon');
+import isRuntimeAddon from './is-runtime-addon';
 
 /**
  * Given a Project instance, traverses the addon inclusion tree to discover all
@@ -21,10 +19,8 @@ const isRuntimeAddon = require('./is-runtime-addon');
  *  - runtimeOnly - only return runtime addons should be returned
  *  - conflictsOnly - only return addons with > 1 version
  */
-module.exports = function reviewProject(project, options) {
+export default function reviewProject(project: any, options: any = {}) {
   // TODO const toNamespace = [].concat(config.namespaceAddons || []);
-
-  options = options || {};
   options.ignoreAddons = IGNORED_ADDONS.concat(options.ignoreAddons || []);
 
   const summaries = Object.create(null);
@@ -42,7 +38,7 @@ module.exports = function reviewProject(project, options) {
   return summaries;
 };
 
-function traverseAddons(parentPath, addons, summaries, options) {
+function traverseAddons(parentPath: string[], addons: any, summaries: any, options: any) {
  for (const addon of addons) {
    const name = addon.pkg.name;
 

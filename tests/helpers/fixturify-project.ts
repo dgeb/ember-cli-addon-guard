@@ -1,9 +1,7 @@
-'use strict';
-
-const path = require('path');
-const FixturifyProject = require('fixturify-project');
-const Project = require('ember-cli/lib/models/project');
-const MockCLI = require('./mock-cli');
+import path from 'path';
+import FixturifyProject from 'fixturify-project';
+import Project from 'ember-cli/lib/models/project';
+import MockCLI from './mock-cli';
 
 // used in these tests to ensure we are only
 // operating on the addons added here
@@ -13,13 +11,13 @@ class ProjectWithoutInternalAddons extends Project {
   }
 }
 
-function prepareAddon(addon) {
+function prepareAddon(addon: any) {
   addon.pkg.keywords.push('ember-addon');
   addon.pkg['ember-addon'] = { };
   addon.files['index.js'] = 'module.exports = { name: require("./package").name };';
 }
 
-function assignCacheKeyForTreeToAddons(addons) {
+function assignCacheKeyForTreeToAddons(addons: any[]) {
   for (const addon of addons) {
     addon.cacheKeyForTree = function() {
       if (addon.pkg.cacheKey) {
@@ -32,18 +30,20 @@ function assignCacheKeyForTreeToAddons(addons) {
   }
 }
 
-module.exports = class EmberCLIFixturifyProject extends FixturifyProject {
+export default class EmberCLIFixturifyProject extends FixturifyProject {
+  _hasWritten: boolean;
+
   writeSync() {
     super.writeSync(...arguments);
     this._hasWritten = true;
   }
 
-  buildProjectModel(ProjectClass = ProjectWithoutInternalAddons) {
+  buildProjectModel(ProjectClass: Project = ProjectWithoutInternalAddons) {
     if (this._hasWritten !== false) {
       this.writeSync();
     }
 
-    let pkg = JSON.parse(this.toJSON('package.json'));
+    let pkg = JSON.parse(this.toJSON('package.json') as string);
     let cli = new MockCLI();
     let root = path.join(this.root, this.name);
 
@@ -53,32 +53,32 @@ module.exports = class EmberCLIFixturifyProject extends FixturifyProject {
     return project;
   }
 
-  addAddon(name, version = '0.0.0', cb) {
+  addAddon(name: string, version = '0.0.0', cb?: (addon: any) => void) {
     return this.addDependency(name, version, addon => {
       prepareAddon(addon);
 
-      if (typeof cb === 'function') {
+      if (cb) {
         cb(addon);
       }
     });
   }
 
-  addDevAddon(name, version = '0.0.0', cb) {
+  addDevAddon(name: string, version = '0.0.0', cb?: (addon: any) => void) {
     return this.addDevDependency(name, version, addon => {
       prepareAddon(addon);
-      if (typeof cb === 'function') {
+      if (cb) {
         cb(addon);
       }
     });
   }
 
-  addInRepoAddon(name, version = '0.0.0', cb) {
+  addInRepoAddon(name: string, version = '0.0.0', cb?: (addon: any) => void) {
     const inRepoAddon = new FixturifyProject(name, version, project => {
       project.pkg.keywords.push('ember-addon');
       project.pkg['ember-addon'] = { };
       project.files['index.js'] = 'module.exports = { name: require("./package").name };';
 
-      if (typeof cb === 'function') {
+      if (cb) {
         cb(project);
       }
     });
@@ -88,7 +88,7 @@ module.exports = class EmberCLIFixturifyProject extends FixturifyProject {
     addon.paths = addon.paths || [];
     const addonPath = `lib/${name}`;
 
-    if (addon.paths.find(path => path.toLowerCase() === addonPath.toLowerCase())) {
+    if (addon.paths.find((path: string) => path.toLowerCase() === addonPath.toLowerCase())) {
       throw new Error(`project: ${this.name} already contains the in-repo-addon: ${name}`);
     }
 

@@ -1,6 +1,6 @@
-const reviewProject = require('../../../lib/utils/review-project');
-const FixturifyProject = require('../../helpers/fixturify-project');
-const expect = require('chai').expect;
+import reviewProject from '../../../lib/utils/review-project';
+import FixturifyProject from '../../helpers/fixturify-project';
+import { expect } from 'chai';
 
 describe('reviewProject', function() {
   it('emits the versions at the root', function() {

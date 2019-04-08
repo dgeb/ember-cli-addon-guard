@@ -1,11 +1,9 @@
-'use strict';
+import readConfig from './lib/utils/read-config';
+import reviewProject from './lib/utils/review-project';
+import dependentsToString from './lib/utils/dependents-to-string';
+// import SilentError from 'silent-error';
 
-const readConfig = require('./lib/utils/read-config');
-const reviewProject = require('./lib/utils/review-project');
-const dependentsToString = require('./lib/utils/dependents-to-string');
-const SilentError = require('silent-error');
-
-module.exports = {
+export default {
   name: require('./package').name,
 
   init() {
@@ -33,7 +31,7 @@ module.exports = {
         description += dependentsToString(addon, conflicts[addon]);
       }
 
-      throw new SilentError(description);
+      throw new Error(description);
     }
   },
 

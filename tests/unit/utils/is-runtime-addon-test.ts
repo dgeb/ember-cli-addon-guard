@@ -1,17 +1,17 @@
-const isRuntimeAddon = require('../../../lib/utils/is-runtime-addon');
-const FixturifyProject = require('../../helpers/fixturify-project');
-const expect = require('chai').expect;
+import isRuntimeAddon from '../../../lib/utils/is-runtime-addon';
+import FixturifyProject from '../../helpers/fixturify-project';
+import { expect } from 'chai';
 
 describe('isRuntimeAddon', function() {
   it('returns true for addons if they have a non-empty `app` or `addon` directory', function() {
     const fixturifyProject = new FixturifyProject('root', '0.0.0');
     fixturifyProject.addDevDependency('ember-cli', '*');
-    fixturifyProject.addAddon('foo', '1.2.3', a => {
+    fixturifyProject.addAddon('foo', '1.2.3', (a: any) => {
       a.files['app'] = {
         'index.html': ''
       };
     });
-    fixturifyProject.addAddon('bar', '1.2.3', a => {
+    fixturifyProject.addAddon('bar', '1.2.3', (a: any) => {
       a.files['addon'] = {
         'components': {
           'bar.js': ''
@@ -28,7 +28,7 @@ describe('isRuntimeAddon', function() {
   it('returns false for addons that have unused `app` and `addon` directories', function() {
     const fixturifyProject = new FixturifyProject('root', '0.0.0');
     fixturifyProject.addDevDependency('ember-cli', '*');
-    fixturifyProject.addAddon('foo', '1.2.3', a => {
+    fixturifyProject.addAddon('foo', '1.2.3', (a: any) => {
       a.files['app'] = {
         '.gitignore': ''
       };
