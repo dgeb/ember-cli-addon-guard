@@ -1,7 +1,6 @@
-const expect = require('chai').expect;
-const dedent = require('../../helpers/dedent');
-
-const dependentsToString = require('../../../lib/utils/dependents-to-string');
+import { expect } from 'chai';
+import dedent from '../../helpers/dedent';
+import dependentsToString from '../../../lib/utils/dependents-to-string';
 
 describe('dependentsToString', function() {
   it('prints simple trees', function() {

@@ -1,12 +1,10 @@
-'use strict';
-
-const path = require('path');
+import path from 'path';
 
 /**
  * Given a Project instance, returns the custom addon-guard config
  * for that project (if any).
  */
-module.exports = function(project) {
+export default function(project: any) {
   const configDirectory = path.dirname(project.configPath());
   try {
     return require(`${configDirectory}/addon-guard`);
@@ -17,4 +15,4 @@ module.exports = function(project) {
       throw error;
     }
   }
-};
+}

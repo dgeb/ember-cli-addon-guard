@@ -17,7 +17,9 @@
 /testem.log
 /yarn-error.log
 
-# ember-try
-/.node_modules.ember-try/
-/bower.json.ember-try
-/package.json.ember-try
+# typescript build artifacts
+*.js.map
+*.d.ts
+lib/**/*.js
+tests/**/*.js
+index.js

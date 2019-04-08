@@ -1,11 +1,9 @@
-'use strict';
+import chalk from 'chalk';
+import readConfig from '../utils/read-config';
+import reviewProject from '../utils/review-project';
+import dependentsToString from '../utils/dependents-to-string';
 
-const chalk = require('chalk');
-const readConfig = require('../utils/read-config');
-const reviewProject = require('../utils/review-project');
-const dependentsToString = require('../utils/dependents-to-string');
-
-module.exports = {
+export default {
   name: 'addon-guard',
   description: 'Review project to ensure that no addon dependency conflicts are present.',
   works: 'insideProject',
@@ -13,7 +11,7 @@ module.exports = {
   // TODO - add options?
   // availableOptions: Object.freeze([]),
 
-  run(options) {
+  run(/* options: any */) {
     const config = readConfig(this.project);
     const conflicts = reviewProject(this.project, config);
     const conflictCount = Object.keys(conflicts).length;

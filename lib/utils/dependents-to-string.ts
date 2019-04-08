@@ -1,14 +1,25 @@
-'use strict';
+import archy from 'archy';
 
-const archy = require('archy');
+export interface Dict<T = unknown> {
+  [key: string]: T;
+}
+
+export type path = string[];
+
+export interface AddonInstance {
+  version: string;
+  dependents: path[];
+}
+
+export type Printer = (version: string, cacheKey: string) => string;
 
 /**
  * Given an addon name, a hash of dependents by version (as returned by discoverAddonVersions),
  * and optionally a function to determine how the addon itself is printed, returns a string
  * containing a printable version of the structure.
  */
-module.exports = function dependentsToString(name, instances, printer) {
-  const tree = {};
+export default function dependentsToString(name: string, instances: Dict<AddonInstance>, printer?: Printer): string {
+  const tree: any = {};
 
   for (const cacheKey of Object.keys(instances)) {
     const instance = instances[cacheKey];
@@ -26,10 +37,10 @@ module.exports = function dependentsToString(name, instances, printer) {
 
   const root = Object.keys(tree)[0];
   return archy(transformTree(root, name, tree[root]));
-};
+}
 
 // Transform the tree from a structure that's convenient to build into the one archy expects
-function transformTree(name, addon, tree) {
+function transformTree(name: string, addon: string, tree: any): archy.Data {
   return {
     label: name,
     nodes: sortKeys(addon, tree).map((key) => {
@@ -43,7 +54,7 @@ function transformTree(name, addon, tree) {
 }
 
 // Boost the addon in question to the top, then alphabetize the rest
-function sortKeys(addon, tree) {
+function sortKeys(addon: string, tree: any) {
   return Object.keys(tree).sort((a, b) => {
     if (a === addon) {
       return -1;
