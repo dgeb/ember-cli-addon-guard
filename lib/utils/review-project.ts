@@ -1,4 +1,33 @@
 import isRuntimeAddon from './is-runtime-addon';
+import { cacheKeyDependencyVersion, validateCacheKeyDependency } from './validate-cache-key-dependency';
+import { ProjectSummary } from '../interfaces';
+
+export interface ReviewProjectOptions {
+  /**
+   * An array of addon names to ignore
+   */
+  ignoreAddons?: string[];
+
+  /**
+   * Only return addons with > 1 version?
+   */
+  conflictsOnly?: boolean;
+
+  /**
+   * Only return runtime addons?
+   */
+  runtimeOnly?: boolean;
+
+  /**
+   * By default, any `calculate-cache-key-for-tree` dependencies in use by this
+   * project and its addons will be checked to ensure that they're updated.
+   *
+   * See https://github.com/ember-cli/calculate-cache-key-for-tree/pull/14
+   *
+   * Pass `true` to skip this check.
+   */
+  skipCacheKeyDependencyCheck?: boolean;
+}
 
 /**
  * Given a Project instance, traverses the addon inclusion tree to discover all
@@ -13,21 +42,20 @@ import isRuntimeAddon from './is-runtime-addon';
  *      ]
  *    }
  *  }
- *
- *  Possible options:
- *  - ignoreAddons - an array of addon names to ignore
- *  - runtimeOnly - only return runtime addons should be returned
- *  - conflictsOnly - only return addons with > 1 version
  */
-export default function reviewProject(project: any, options: any = {}) {
+export default function reviewProject(project: any, options: ReviewProjectOptions = {}): ProjectSummary {
   // TODO const toNamespace = [].concat(config.namespaceAddons || []);
   options.ignoreAddons = IGNORED_ADDONS.concat(options.ignoreAddons || []);
 
-  const summaries = Object.create(null);
+  const summary: ProjectSummary = {
+    addons: {},
+    errors: []
+  };
 
-  traverseAddons([project.name()], project.addons, summaries, options);
+  traverseAddons([project.name()], project.addons, summary, options);
 
   if (options.conflictsOnly) {
+    const summaries = summary.addons;
     for (const name in summaries) {
       if (Object.keys(summaries[name]).length < 2) {
         delete summaries[name];
@@ -35,31 +63,47 @@ export default function reviewProject(project: any, options: any = {}) {
     }
   }
 
-  return summaries;
+  if (!options.skipCacheKeyDependencyCheck) {
+    const version = cacheKeyDependencyVersion(project.dependencies(), project.root);
+    if (version && !validateCacheKeyDependency(version)) {
+      summary.errors.push(`This project has a dependency on 'calculate-cache-key-for-tree@${version}'. Update to v1.2.3 or later to avoid unnecessary addon duplication.`);
+    }
+  }
+
+  return summary;
 };
 
-function traverseAddons(parentPath: string[], addons: any, summaries: any, options: any) {
- for (const addon of addons) {
-   const name = addon.pkg.name;
+function traverseAddons(parentPath: string[], addons: any, summary: ProjectSummary, options: ReviewProjectOptions) {
+  for (const addon of addons) {
+    const name = addon.pkg.name;
 
-   if (!options.ignoreAddons.includes(name) &&
-       (!options.runtimeOnly || isRuntimeAddon(addon))) {
+    if (!options.ignoreAddons.includes(name) &&
+        (!options.runtimeOnly || isRuntimeAddon(addon))) {
 
-     const cacheKey = addon.cacheKeyForTree && addon.cacheKeyForTree();
-     const version = addon.pkg.version;
+      const cacheKey = addon.cacheKeyForTree && addon.cacheKeyForTree();
+      const version = addon.pkg.version;
 
-     if (cacheKey && version) {
-       const summary = summaries[name] || (summaries[name] = Object.create(null));
-       const keyedSummary = summary[cacheKey] || (summary[cacheKey] = {
-         version,
-         cacheKey,
-         dependents: []
-       });
-       keyedSummary.dependents.push(parentPath);
-     }
-   }
+      if (cacheKey && version) {
+        const addonSummary = summary.addons[name] || (summary.addons[name] = Object.create(null));
+        const keyedSummary = addonSummary[cacheKey] || (addonSummary[cacheKey] = {
+          version,
+          cacheKey,
+          dependents: []
+        });
+        keyedSummary.dependents.push(parentPath);
+      }
 
-   traverseAddons(parentPath.concat(name), addon.addons || [], summaries, options);
+      if (!options.skipCacheKeyDependencyCheck) {
+        const version = cacheKeyDependencyVersion(addon.dependencies(), addon.root);
+        if (version && !validateCacheKeyDependency(version)) {
+          summary.errors.push(`The addon '${name}' has a dependency on 'calculate-cache-key-for-tree@${version}'. Update to v1.2.3 or later to avoid unnecessary addon duplication.`);
+        }
+      }
+    }
+
+    if (addon.addons) {
+      traverseAddons(parentPath.concat(name), addon.addons, summary, options);
+    }
   }
 }
 
