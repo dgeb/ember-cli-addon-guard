@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import readConfig from './lib/utils/read-config';
 import reviewProject, { ReviewProjectOptions } from './lib/utils/review-project';
 import dependentsToString from './lib/utils/dependents-to-string';
@@ -14,6 +15,12 @@ module.exports = {
 
   preBuild() {
     const config: AddonGuardConfig = this.addonGuardConfig;
+
+    if (config.skipBuildChecks) {
+      this.ui.writeLine(chalk.yellow('WARNING: ember-cli-addon-guard is configured to skip all checks during builds. To override this, set `skipBuildChecks: false` in `config/addon-guard.js`.'));
+      return;
+    }
+
     const options: ReviewProjectOptions = {
       ignoreAddons: config.ignoreAddons || [],
       runtimeOnly: true,

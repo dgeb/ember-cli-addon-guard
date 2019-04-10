@@ -1,4 +1,5 @@
 export interface AddonGuardConfig {
+  skipBuildChecks?: boolean;
   skipCacheKeyDependencyChecks?: boolean;
   ignoreAddons?: string[];
 }
@@ -19,5 +20,4 @@ export type AddonSummaries = Dict<AddonSummary>;
 export interface ProjectSummary {
   addons: Dict<AddonSummaries>;
   errors: string[];
-  // ignoredAddons: string[];
 }
