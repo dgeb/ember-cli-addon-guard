@@ -26,7 +26,7 @@ export interface ReviewProjectOptions {
    *
    * Pass `true` to skip this check.
    */
-  skipCacheKeyDependencyCheck?: boolean;
+  skipCacheKeyDependencyChecks?: boolean;
 }
 
 /**
@@ -63,7 +63,7 @@ export default function reviewProject(project: any, options: ReviewProjectOption
     }
   }
 
-  if (!options.skipCacheKeyDependencyCheck) {
+  if (!options.skipCacheKeyDependencyChecks) {
     const version = cacheKeyDependencyVersion(project.dependencies(), project.root);
     if (version && !validateCacheKeyDependency(version)) {
       summary.errors.push(`This project has a dependency on 'calculate-cache-key-for-tree@${version}'. Update to v1.2.3 or later to avoid unnecessary addon duplication.`);
@@ -93,7 +93,7 @@ function traverseAddons(parentPath: string[], addons: any, summary: ProjectSumma
         keyedSummary.dependents.push(parentPath);
       }
 
-      if (!options.skipCacheKeyDependencyCheck) {
+      if (!options.skipCacheKeyDependencyChecks) {
         const version = cacheKeyDependencyVersion(addon.dependencies(), addon.root);
         if (version && !validateCacheKeyDependency(version)) {
           summary.errors.push(`The addon '${name}' has a dependency on 'calculate-cache-key-for-tree@${version}'. Update to v1.2.3 or later to avoid unnecessary addon duplication.`);

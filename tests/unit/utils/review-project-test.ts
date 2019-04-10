@@ -292,7 +292,7 @@ describe('reviewProject', function() {
     fixturifyProject.addDependency('calculate-cache-key-for-tree', '1.2.0');
     const project = fixturifyProject.buildProjectModel();
 
-    expect(reviewProject(project, { skipCacheKeyDependencyCheck: true })).to.deep.equal({
+    expect(reviewProject(project, { skipCacheKeyDependencyChecks: true })).to.deep.equal({
       addons: {},
       errors: []
     });
