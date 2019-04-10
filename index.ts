@@ -18,7 +18,7 @@ module.exports = {
       ignoreAddons: config.ignoreAddons || [],
       runtimeOnly: true,
       conflictsOnly: true,
-      skipCacheKeyDependencyCheck: config.skipCacheKeyDependencyCheck
+      skipCacheKeyDependencyChecks: config.skipCacheKeyDependencyChecks
     };
     const summary = reviewProject(this.project, options);
     const addons = summary.addons;

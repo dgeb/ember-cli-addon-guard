@@ -1,6 +1,6 @@
 export interface AddonGuardConfig {
+  skipCacheKeyDependencyChecks?: boolean;
   ignoreAddons?: string[];
-  skipCacheKeyDependencyCheck?: boolean;
 }
 
 export interface Dict<T = unknown> {
