@@ -1,4 +1,4 @@
-# ember-cli-addon-guard
+# ember-cli-addon-guard [![Build Status](https://travis-ci.org/dgeb/ember-cli-addon-guard.svg?branch=master)](https://travis-ci.org/dgeb/ember-cli-addon-guard)
 
 This addon guards against addon interop issues that can arise in ember-cli projects.
 
