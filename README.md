@@ -76,22 +76,6 @@ Other configuration options include:
 
 * `skipCacheKeyDependencyChecks: true` - skip the cache-key dependency checks mentioned above.
 
-### Coming Soon: Namespacing
-
-Another option will soon be available with `ember-cli-addon-guard`: multiple versions of addons will be allowed to coexist by namespacing each of them by their version. When these addons are merged together, their names will now be unique, which should allow them to co-exist. This approach should be used with caution and well-tested, but should work with most well-behaved addons that have no concept of shared global state. In order to enable namespacing, each addon must be explicitly opted-in via a configuration file (see below).
-
-The `namespaceAddons` option is not yet supported, but will soon allow you to opt-in to namespacing specific addons that you need to co-exist with different versions:
-
-```js
-// config/addon-guard.js
-module.exports = {
-  namespaceAddons: [
-    'ember-wormhole',
-    'sparkles-component'
-  ]
-};
-```
-
 ## History and Attribution
 
 This project is based upon the excellent [ember-cli-dependency-lint](https://github.com/salsify/ember-cli-dependency-lint) addon. It was forked from the original project for the following reasons:
@@ -103,8 +87,6 @@ This project is based upon the excellent [ember-cli-dependency-lint](https://git
 * `ember-cli-addon-guard` is only concerned with addons that are built for _run-time_. This is inferred from the directories and files present in each addon. Build-time-only addons don't need to be explicitly safelisted, as they do in `ember-cli-dependency-lint`.
 
 * `ember-cli-addon-guard` identifies addons uniquely by name and _cache-key_, not version, as explained above.
-
-* `ember-cli-addon-guard` will soon provide an option to namespace specific addons in order to allow multiple versions to co-exist at run-time without conflict. Thus, it will soon go beyond "linting" and assist with resolving conflicts.
 
 _Note from @dgeb: I'd be glad to contribute this fork back to Salsify or to the ember-cli org, wherever it can be most useful. Hopefully, a single, shared solution will be adopted by default for ember-cli projects, as is being discussed in [Ember RFC 464](https://github.com/emberjs/rfcs/pull/464)._
 
