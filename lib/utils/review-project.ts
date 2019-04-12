@@ -80,10 +80,10 @@ function traverseAddons(parentPath: string[], addons: any, summary: ProjectSumma
     if (!options.ignoreAddons.includes(name) &&
         (!options.runtimeOnly || isRuntimeAddon(addon))) {
 
-      const cacheKey = addon.cacheKeyForTree && addon.cacheKeyForTree();
       const version = addon.pkg.version;
 
-      if (cacheKey && version) {
+      if (version) {
+        const cacheKey = (addon.cacheKeyForTree && addon.cacheKeyForTree()) || version;
         const addonSummary = summary.addons[name] || (summary.addons[name] = Object.create(null));
         const keyedSummary = addonSummary[cacheKey] || (addonSummary[cacheKey] = {
           version,
