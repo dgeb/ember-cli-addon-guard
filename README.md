@@ -1,6 +1,6 @@
 # ember-cli-addon-guard [![Build Status](https://travis-ci.org/dgeb/ember-cli-addon-guard.svg?branch=master)](https://travis-ci.org/dgeb/ember-cli-addon-guard)
 
-This addon guards against addon interop issues that can arise in ember-cli projects.
+This addon guards against addon interop issues that can arise in `ember-cli` projects.
 
 ## Motivation
 
@@ -17,7 +17,7 @@ my-app
 
 Your package manager notices the conflicting version requirements for `ember-wormhole` and helpfully makes sure each addon gets the version it's asking for. But your final built application will only have one copy of `ember-wormhole`—which version will it be?
 
-Ember CLI's current build process will merge both versions together, with files from one version clobbering files from the other whenever they have the same name. This also means either `ember-modal-dialog` or `ember-power-select` will wind up attempting to use a version of `ember-wormhole` that it's not expecting, which can lead to anything from hard exceptions to subtle behavioral bugs.
+`ember-cli`'s current build process will merge both versions together, with files from one version clobbering files from the other whenever they have the same name. This also means either `ember-modal-dialog` or `ember-power-select` will wind up attempting to use a version of `ember-wormhole` that it's not expecting, which can lead to anything from hard exceptions to subtle behavioral bugs.
 
 In the scenario described above, the version conflict arose because of adding a new dependency, but it can also happen when you update an existing one. Regardless of how it happens, it may or may not immediately be obvious that something is wrong. The things that break may be subtle, or in untested edges cases in your application.
 
@@ -42,9 +42,11 @@ For this reason, `ember-cli-addon-guard` is only concerned with preventing multi
 
 ### Cache-keys vs. Versions
 
-So far, we've discussed addon duplication in terms of addon names and versions. Ember CLI actually takes a more nuanced and customizable approach to identifying unique instances of addons: cache-keys. By default, an addon's cache-key is calculated from a hash of its package.json (minus any private keys). An addon may also customize its cache-key, via a custom implementation of `cacheKeyForTree`, which can be narrower _or_ broader than the default cache-key.
+So far, we've discussed addon duplication in terms of addon names and versions. `ember-cli` currently takes a dynamic and customizable approach to identifying unique instances of addons: cache-keys. By default, an addon's cache-key is calculated from a hash of its package.json (minus any private keys). An addon may also customize its cache-key, via a custom implementation of `cacheKeyForTree`, which can be narrower _or_ broader than the default cache-key.
 
-For consistency with Ember CLI and its ecosystem, `ember-cli-addon-guard` also relies upon each addon's cache-key to determine uniqueness. Whenever dependency trees are displayed, addons will be shown together with a version and a cache-key for clarity.
+For consistency with `ember-cli` and its ecosystem, `ember-cli-addon-guard` also relies upon each addon's cache-key to determine uniqueness if that addon supports `cacheKeyForTree`. When cache-keys are used, they will be displayed together with version in dependency trees.
+
+Usage of cache-keys will go away with the introduction of [embroider](https://github.com/embroider-build/embroider/blob/master/SPEC.md) v2 addons, which take a static approach to identifying package uniqueness that is simpler and more robust. `ember-cli-addon-guard` will remain compatible with these embroider packages by reverting to version keys when addons don't support `cacheKeyForTree`.
 
 _Note: The addon that calculates cache-keys by default, `calculate-cache-key-for-tree`, was just recently updated to ignore private, package-manager-specific keys that may be added to `package.json` files. Prior to v1.2.3, this may have made cache-keys much more unique and created a lot of false-positives when checking for multiple versions of an addon. For this reason, `ember-cli-addon-guard` includes a validation check to ensure that any instances of `calculate-cache-key-for-tree` that are encountered are version >= 1.2.3._
 
@@ -84,11 +86,11 @@ This project is based upon the excellent [ember-cli-dependency-lint](https://git
 
 * By default, `ember-cli-addon-guard` runs prior to every build and strictly prevents addon dependency conflicts that have not been explicitly ignored.
 
-* `ember-cli-addon-guard` is only concerned with addons that are built for _run-time_. This is inferred from the directories and files present in each addon. Build-time-only addons don't need to be explicitly safelisted, as they do in `ember-cli-dependency-lint`.
+* `ember-cli-addon-guard` is only concerned with addons that introduce run-time modules. This is inferred from the directories and files present in each addon. Build-time-only addons don't need to be explicitly safelisted, as they do in `ember-cli-dependency-lint`.
 
-* `ember-cli-addon-guard` identifies addons uniquely by name and _cache-key_, not version, as explained above.
+* `ember-cli-addon-guard` identifies addons uniquely by name and _cache-key_, if available, for compatibility with the current approach taken by `ember-cli`. If cache-keys are not supported by a particular addon, version will be used, which should be forward-compatible with embroider (as explained above).
 
-_Note from @dgeb: I'd be glad to contribute this fork back to Salsify or to the ember-cli org, wherever it can be most useful. Hopefully, a single, shared solution will be adopted by default for ember-cli projects, as is being discussed in [Ember RFC 464](https://github.com/emberjs/rfcs/pull/464)._
+_Note from @dgeb: I'll be glad to contribute this fork back to Salsify or to the ember-cli org, wherever it can be most useful. Hopefully, a single, shared solution will be adopted by default for ember-cli projects, as is being discussed in [Ember RFC 464](https://github.com/emberjs/rfcs/pull/464)._
 
 ## Contributing
 

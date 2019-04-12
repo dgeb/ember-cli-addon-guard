@@ -21,7 +21,13 @@ export default function dependentsToString(name: string, instances: Dict<AddonSu
         if (!node[layer]) node[layer] = {};
         node = node[layer];
       }
-      node[name] = printer ? printer(version, cacheKey) : `${name}@${version} (cacheKey: ${cacheKey})`;
+      if (printer) {
+        node[name] = printer(version, cacheKey);
+      } else if (cacheKey && cacheKey !== version) {
+        node[name] = `${name}@${version} (cacheKey: ${cacheKey})`;
+      } else {
+        node[name] = `${name}@${version}`;
+      }
     }
   }
 

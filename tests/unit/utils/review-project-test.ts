@@ -68,6 +68,51 @@ describe('reviewProject', function() {
     });
   });
 
+  it('keys by version if cacheKeyForTree is unavailable', function() {
+    const fixturifyProject = new FixturifyProject('root', '0.0.0');
+    fixturifyProject.addDevDependency('ember-cli', '*');
+    fixturifyProject.addAddon('foo', '1.2.3');
+    fixturifyProject.addAddon('bar', '1.0.0', a => {
+      a.addAddon('baz', '5.0.1');
+    });
+    const project = fixturifyProject.buildProjectModel();
+
+    function clearCacheKeyForTreeToAddons(addons: any[]) {
+      for (const addon of addons) {
+        addon.cacheKeyForTree = function() {}
+        clearCacheKeyForTreeToAddons(addon.addons);
+      }
+    }
+    clearCacheKeyForTreeToAddons(project.addons);
+
+    expect(reviewProject(project)).to.deep.equal({
+      addons: {
+        foo: {
+          '1.2.3': {
+            version: '1.2.3',
+            cacheKey: '1.2.3',
+            dependents: [['root']]
+          }
+        },
+        bar: {
+          '1.0.0': {
+            version: '1.0.0',
+            cacheKey: '1.0.0',
+            dependents: [['root']]
+          }
+        },
+        baz: {
+          '5.0.1': {
+            version: '5.0.1',
+            cacheKey: '5.0.1',
+            dependents: [['root', 'bar']]
+          }
+        }
+      },
+      errors: []
+    });
+  });
+
   it('coalesces same versions found in different locations', function() {
     const fixturifyProject = new FixturifyProject('root', '0.0.0');
     fixturifyProject.addDevDependency('ember-cli', '*');
@@ -109,7 +154,7 @@ describe('reviewProject', function() {
         }
       },
       errors: []
-   });
+    });
   });
 
   it('records different versions found in different locations', function() {

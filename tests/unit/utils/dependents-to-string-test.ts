@@ -59,6 +59,26 @@ describe('dependentsToString', function() {
     `);
   });
 
+  it('ignores printing a cacheKey that is identical to version', function() {
+    const instances = {
+      '1.0.0': {
+        version: '1.0.0',
+        cacheKey: '1.0.0',
+        dependents: [
+          ['foo'],
+          ['foo', 'bar'],
+        ]
+      }
+    };
+
+    expect(dependentsToString('my-addon', instances)).to.equal(dedent`
+      foo
+      ├── my-addon@1.0.0
+      └─┬ bar
+        └── my-addon@1.0.0
+    `);
+  });
+
   it('allows for custom formatting of the addon name', function() {
     const printer = (version, cacheKey) => `${version}<->${version.split('').reverse().join('')} (cacheKey: ${cacheKey})`;
     const instances = {
