@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import dedent from '../../helpers/dedent';
 import dependentsToString from '../../../lib/utils/dependents-to-string';
 
-describe('dependentsToString', function() {
+describe('Unit: dependentsToString', function() {
   it('prints simple trees', function() {
     const instances = {
       '123456': {

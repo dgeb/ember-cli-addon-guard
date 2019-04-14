@@ -2,7 +2,7 @@ import reviewProject from '../../../lib/utils/review-project';
 import FixturifyProject from '../../helpers/fixturify-project';
 import { expect } from 'chai';
 
-describe('reviewProject', function() {
+describe('Unit: reviewProject', function() {
   it('emits the versions at the root', function() {
     const fixturifyProject = new FixturifyProject('root', '0.0.0');
     fixturifyProject.addDevDependency('ember-cli', '*');
