@@ -10,14 +10,16 @@ export interface Dict<T = unknown> {
 
 export type path = string[];
 
-export interface AddonSummary {
+export interface AddonVersionSummary {
   version: string;
   dependents: path[];
+  cacheKey?: string;
+  runtime?: boolean;
 }
 
-export type AddonSummaries = Dict<AddonSummary>;
+export type AddonSummary = Dict<AddonVersionSummary>;
 
 export interface ProjectSummary {
-  addons: Dict<AddonSummaries>;
+  addons: Dict<AddonSummary>;
   errors: string[];
 }

@@ -16,6 +16,7 @@ describe('Unit: reviewProject', function() {
           'foo:1.2.3': {
             version: '1.2.3',
             cacheKey: 'foo:1.2.3',
+            runtime: false,
             dependents: [['root']]
           }
         },
@@ -23,6 +24,7 @@ describe('Unit: reviewProject', function() {
           'bar:1.0.0': {
             version: '1.0.0',
             cacheKey: 'bar:1.0.0',
+            runtime: false,
             dependents: [['root']]
           }
         }
@@ -46,6 +48,7 @@ describe('Unit: reviewProject', function() {
           'foo:1.2.3': {
             version: '1.2.3',
             cacheKey: 'foo:1.2.3',
+            runtime: false,
             dependents: [['root']]
           }
         },
@@ -53,6 +56,7 @@ describe('Unit: reviewProject', function() {
           'bar:1.0.0': {
             version: '1.0.0',
             cacheKey: 'bar:1.0.0',
+            runtime: false,
             dependents: [['root']]
           }
         },
@@ -60,6 +64,7 @@ describe('Unit: reviewProject', function() {
           'baz:5.0.1': {
             version: '5.0.1',
             cacheKey: 'baz:5.0.1',
+            runtime: false,
             dependents: [['root', 'bar']]
           }
         }
@@ -91,6 +96,7 @@ describe('Unit: reviewProject', function() {
           '1.2.3': {
             version: '1.2.3',
             cacheKey: '1.2.3',
+            runtime: false,
             dependents: [['root']]
           }
         },
@@ -98,6 +104,7 @@ describe('Unit: reviewProject', function() {
           '1.0.0': {
             version: '1.0.0',
             cacheKey: '1.0.0',
+            runtime: false,
             dependents: [['root']]
           }
         },
@@ -105,6 +112,7 @@ describe('Unit: reviewProject', function() {
           '5.0.1': {
             version: '5.0.1',
             cacheKey: '5.0.1',
+            runtime: false,
             dependents: [['root', 'bar']]
           }
         }
@@ -131,6 +139,7 @@ describe('Unit: reviewProject', function() {
           'foo:1.2.3': {
             version: '1.2.3',
             cacheKey: 'foo:1.2.3',
+            runtime: false,
             dependents: [
               ['root', 'bar', 'baz'],
               ['root', 'bar'],
@@ -142,6 +151,7 @@ describe('Unit: reviewProject', function() {
           'bar:1.0.0': {
             version: '1.0.0',
             cacheKey: 'bar:1.0.0',
+            runtime: false,
             dependents: [['root']]
           }
         },
@@ -149,6 +159,7 @@ describe('Unit: reviewProject', function() {
           'baz:5.0.1': {
             version: '5.0.1',
             cacheKey: 'baz:5.0.1',
+            runtime: false,
             dependents: [['root', 'bar']]
           }
         }
@@ -175,16 +186,19 @@ describe('Unit: reviewProject', function() {
           'foo:1.2.3': {
             version: '1.2.3',
             cacheKey: 'foo:1.2.3',
+            runtime: false,
             dependents: [['root', 'bar', 'baz']]
           },
           'foo:1.2.5': {
             version: '1.2.5',
             cacheKey: 'foo:1.2.5',
+            runtime: false,
             dependents: [['root', 'bar']]
           },
           'foo:2.0.1': {
             version: '2.0.1',
             cacheKey: 'foo:2.0.1',
+            runtime: false,
             dependents: [['root']]
           }
         },
@@ -192,6 +206,7 @@ describe('Unit: reviewProject', function() {
           'bar:1.0.0': {
             version: '1.0.0',
             cacheKey: 'bar:1.0.0',
+            runtime: false,
             dependents: [['root']]
           }
         },
@@ -199,6 +214,7 @@ describe('Unit: reviewProject', function() {
           'baz:5.0.1': {
             version: '5.0.1',
             cacheKey: 'baz:5.0.1',
+            runtime: false,
             dependents: [['root', 'bar']]
           }
         }
@@ -231,6 +247,7 @@ describe('Unit: reviewProject', function() {
           'bar:1.0.0': {
             version: '1.0.0',
             cacheKey: 'bar:1.0.0',
+            runtime: true,
             dependents: [['root']]
           }
         },
@@ -238,6 +255,7 @@ describe('Unit: reviewProject', function() {
           'baz:5.0.1': {
             version: '5.0.1',
             cacheKey: 'baz:5.0.1',
+            runtime: true,
             dependents: [['root', 'bar']]
           }
         }
@@ -264,6 +282,7 @@ describe('Unit: reviewProject', function() {
           'baz:5.0.1': {
             version: '5.0.1',
             cacheKey: 'baz:5.0.1',
+            runtime: false,
             dependents: [['root', 'bar']]
           }
         }
@@ -290,16 +309,19 @@ describe('Unit: reviewProject', function() {
           'foo:1.2.3': {
             version: '1.2.3',
             cacheKey: 'foo:1.2.3',
+            runtime: false,
             dependents: [['root', 'bar', 'baz']]
           },
           'foo:1.2.5': {
             version: '1.2.5',
             cacheKey: 'foo:1.2.5',
+            runtime: false,
             dependents: [['root', 'bar']]
           },
           'foo:2.0.1': {
             version: '2.0.1',
             cacheKey: 'foo:2.0.1',
+            runtime: false,
             dependents: [['root']]
           }
         }

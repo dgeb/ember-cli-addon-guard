@@ -1,19 +1,19 @@
 import archy from 'archy';
-import { Dict, AddonSummary } from '../interfaces';
+import { Dict, AddonVersionSummary } from '../interfaces';
 
-export type Printer = (version: string, cacheKey: string) => string;
+export type Printer = (version: string, cacheKey: string, runtime: boolean) => string;
 
 /**
  * Given an addon name, a hash of dependents by version (as returned by discoverAddonVersions),
  * and optionally a function to determine how the addon itself is printed, returns a string
  * containing a printable version of the structure.
  */
-export default function dependentsToString(name: string, instances: Dict<AddonSummary>, printer?: Printer): string {
+export default function dependentsToString(name: string, instances: Dict<AddonVersionSummary>, printer?: Printer): string {
   const tree: any = {};
 
   for (const cacheKey of Object.keys(instances)) {
     const instance = instances[cacheKey];
-    const { version, dependents } = instance;
+    const { version, runtime, dependents } = instance;
 
     for (const dependent of dependents) {
       let node = tree;
@@ -22,11 +22,22 @@ export default function dependentsToString(name: string, instances: Dict<AddonSu
         node = node[layer];
       }
       if (printer) {
-        node[name] = printer(version, cacheKey);
-      } else if (cacheKey && cacheKey !== version) {
-        node[name] = `${name}@${version} (cacheKey: ${cacheKey})`;
+        node[name] = printer(version, cacheKey, runtime);
       } else {
+        let details = [];
+
+        if (cacheKey && cacheKey !== version) {
+          details.push(`cacheKey: ${cacheKey}`);
+        }
+        if (runtime) {
+          details.push(`runtime: true`);
+        }
+
         node[name] = `${name}@${version}`;
+
+        if (details.length > 0) {
+          node[name] += ` (${details.join(', ')})`;
+        }
       }
     }
   }
