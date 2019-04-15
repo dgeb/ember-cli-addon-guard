@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import dedent from '../../helpers/dedent';
 import dependentsToString from '../../../lib/utils/dependents-to-string';
 
-describe('dependentsToString', function() {
+describe('Unit: dependentsToString', function() {
   it('prints simple trees', function() {
     const instances = {
       '123456': {
@@ -79,17 +79,40 @@ describe('dependentsToString', function() {
     `);
   });
 
+  it('includes `runtime: true` if appropriate', function() {
+    const instances = {
+      '123': {
+        version: '1.0.0',
+        cacheKey: '123',
+        runtime: true,
+        dependents: [
+          ['foo'],
+          ['foo', 'bar'],
+        ]
+      }
+    };
+
+    expect(dependentsToString('my-addon', instances)).to.equal(dedent`
+      foo
+      ├── my-addon@1.0.0 (cacheKey: 123, runtime: true)
+      └─┬ bar
+        └── my-addon@1.0.0 (cacheKey: 123, runtime: true)
+    `);
+  });
+
   it('allows for custom formatting of the addon name', function() {
-    const printer = (version, cacheKey) => `${version}<->${version.split('').reverse().join('')} (cacheKey: ${cacheKey})`;
+    const printer = (version, cacheKey, runtime) => `${version}<->${version.split('').reverse().join('')} (cacheKey: ${cacheKey}, runtime: ${runtime})`;
     const instances = {
       '123456': {
         version: '1.0.0',
+        runtime: true,
         dependents: [
           ['foo']
         ]
       },
       'abcdef': {
         version: '2.3.4',
+        runtime: false,
         dependents: [
           ['foo', 'bar']
         ]
@@ -98,9 +121,9 @@ describe('dependentsToString', function() {
 
     expect(dependentsToString('my-addon', instances, printer)).to.equal(dedent`
       foo
-      ├── 1.0.0<->0.0.1 (cacheKey: 123456)
+      ├── 1.0.0<->0.0.1 (cacheKey: 123456, runtime: true)
       └─┬ bar
-        └── 2.3.4<->4.3.2 (cacheKey: abcdef)
+        └── 2.3.4<->4.3.2 (cacheKey: abcdef, runtime: false)
     `);
   });
 });

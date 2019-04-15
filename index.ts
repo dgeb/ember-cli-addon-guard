@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import readConfig from './lib/utils/read-config';
 import reviewProject, { ReviewProjectOptions } from './lib/utils/review-project';
 import dependentsToString from './lib/utils/dependents-to-string';
-import { AddonGuardConfig, AddonSummary, Dict } from './lib/interfaces';
+import { AddonGuardConfig, AddonVersionSummary, Dict } from './lib/interfaces';
 import SilentError from 'silent-error';
 
 module.exports = {
@@ -45,7 +45,7 @@ module.exports = {
         description += `Your application is dependent on multiple versions of the following run-time ${ conflictCount > 1 ? 'addons' : 'addon'}:\n`;
 
         for (const name in addons) {
-          const addonSummaries: Dict<AddonSummary> = addons[name];
+          const addonSummaries: Dict<AddonVersionSummary> = addons[name];
           description += `\n${name}\n----------------------------------------\n`;
           description += dependentsToString(name, addonSummaries);
         }

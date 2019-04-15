@@ -2,7 +2,7 @@ import isRuntimeAddon from '../../../lib/utils/is-runtime-addon';
 import FixturifyProject from '../../helpers/fixturify-project';
 import { expect } from 'chai';
 
-describe('isRuntimeAddon', function() {
+describe('Unit: isRuntimeAddon', function() {
   it('returns true for addons if they have a non-empty `app` or `addon` directory', function() {
     const fixturifyProject = new FixturifyProject('root', '0.0.0');
     fixturifyProject.addDevDependency('ember-cli', '*');

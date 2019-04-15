@@ -1,39 +1,73 @@
 import chalk from 'chalk';
 import readConfig from '../utils/read-config';
-import reviewProject, { ReviewProjectOptions } from '../utils/review-project';
+import reviewProject from '../utils/review-project';
 import dependentsToString from '../utils/dependents-to-string';
-import { AddonSummary, Dict } from '../interfaces';
+import { AddonVersionSummary, Dict } from '../interfaces';
 
 module.exports = {
   name: 'addon-guard',
   description: 'Review project to ensure that no addon dependency conflicts are present.',
   works: 'insideProject',
 
-  // TODO - add options?
-  // availableOptions: Object.freeze([]),
+  availableOptions: Object.freeze([
+    {
+      name: 'all',
+      type: Boolean,
+      default: false,
+      description: 'whether to include all addons, including those without run-time conflicts',
+    }
+  ]),
 
-  run(/* options: any */) {
+  run(options: any) {
     const config = readConfig(this.project);
-    const options: ReviewProjectOptions = {
+    const summary = reviewProject(this.project, {
       ignoreAddons: config.ignoreAddons || [],
-      runtimeOnly: true,
-      conflictsOnly: true,
+      runtimeOnly: !options.all,
+      conflictsOnly: !options.all,
       skipCacheKeyDependencyChecks: config.skipCacheKeyDependencyChecks
-    };
-    const summary = reviewProject(this.project, options);
+    });
     const addons = summary.addons;
     const addonCount = Object.keys(addons).length;
+    let duplicateAddons = {};
 
-    if (addonCount > 0) {
-      this.ui.writeLine(chalk.white(`${addonCount} addons identified by ember-cli-addon-guard:\n`));
+    if (options.all) {
+      if (addonCount > 0) {
+        this.ui.writeLine(chalk.white(`ember-cli-addon-guard identified ${addonCount} addons:\n`));
 
-      for (const name in addons) {
-        const addonInstances: Dict<AddonSummary> = addons[name];
-        this.ui.writeLine(chalk.underline(`${name}`));
-        this.ui.writeLine(dependentsToString(name, addonInstances));
+        for (const name in addons) {
+          const addonInstances: Dict<AddonVersionSummary> = addons[name];
+          this.ui.writeLine(chalk.underline(`${name}`));
+          this.ui.writeLine(dependentsToString(name, addonInstances));
+          if (Object.keys(addonInstances).length > 1) {
+            duplicateAddons[name] = addonInstances;
+          }
+        }
+      } else {
+        this.ui.writeLine(chalk.green(`ember-cli-addon-guard could not identify any addons.`));
+      }
+    } else if (addonCount > 0) {
+      duplicateAddons = addons;
+    }
+
+    if (Object.keys(duplicateAddons).length > 0 || summary.errors.length > 0) {
+      if (Object.keys(duplicateAddons).length > 0) {
+        this.ui.writeLine(chalk.red(`ember-cli-addon-guard determined that your application is dependent on multiple versions of the following run-time ${ addonCount > 1 ? 'addons' : 'addon'}:\n`));
+
+        for (const name in duplicateAddons) {
+          const addonInstances: Dict<AddonVersionSummary> = duplicateAddons[name];
+          this.ui.writeLine(chalk.red(chalk.underline(`${name}`)));
+          this.ui.writeLine(chalk.red(dependentsToString(name, addonInstances)));
+        }
+      }
+
+      if (summary.errors.length > 0) {
+        this.ui.writeLine(chalk.red(`ember-cli-addon-guard has identified the following errors:\n`));
+        for (const error of summary.errors) {
+          this.ui.writeLine(chalk.red(error) + '\n');
+        }
       }
     } else {
-      this.ui.writeLine(chalk.green(`No matching addons were found by ember-cli-addon-guard.`));
+      this.ui.writeLine(chalk.green(`ember-cli-addon-guard found no problems with your project.`));
     }
   }
 };

@@ -1,6 +1,6 @@
 import isRuntimeAddon from './is-runtime-addon';
 import { cacheKeyDependencyVersion, validateCacheKeyDependency } from './validate-cache-key-dependency';
-import { ProjectSummary } from '../interfaces';
+import { ProjectSummary, AddonVersionSummary } from '../interfaces';
 
 export interface ReviewProjectOptions {
   /**
@@ -47,18 +47,17 @@ export default function reviewProject(project: any, options: ReviewProjectOption
   // TODO const toNamespace = [].concat(config.namespaceAddons || []);
   options.ignoreAddons = IGNORED_ADDONS.concat(options.ignoreAddons || []);
 
-  const summary: ProjectSummary = {
-    addons: {},
-    errors: []
-  };
+  const addons = {};
+  const errors = [];
+
+  const summary: ProjectSummary = { addons, errors };
 
   traverseAddons([project.name()], project.addons, summary, options);
 
   if (options.conflictsOnly) {
-    const summaries = summary.addons;
-    for (const name in summaries) {
-      if (Object.keys(summaries[name]).length < 2) {
-        delete summaries[name];
+    for (const name in addons) {
+      if (Object.keys(addons[name]).length < 2) {
+        delete addons[name];
       }
     }
   }
@@ -76,24 +75,26 @@ export default function reviewProject(project: any, options: ReviewProjectOption
 function traverseAddons(parentPath: string[], addons: any, summary: ProjectSummary, options: ReviewProjectOptions) {
   for (const addon of addons) {
     const name = addon.pkg.name;
+    const runtime = isRuntimeAddon(addon);
 
     if (!options.ignoreAddons.includes(name) &&
-        (!options.runtimeOnly || isRuntimeAddon(addon))) {
+        (!options.runtimeOnly || runtime)) {
 
       const version = addon.pkg.version;
 
       if (version) {
         const cacheKey = (addon.cacheKeyForTree && addon.cacheKeyForTree()) || version;
         const addonSummary = summary.addons[name] || (summary.addons[name] = Object.create(null));
-        const keyedSummary = addonSummary[cacheKey] || (addonSummary[cacheKey] = {
+        const keyedSummary: AddonVersionSummary = addonSummary[cacheKey] || (addonSummary[cacheKey] = {
           version,
           cacheKey,
+          runtime,
           dependents: []
         });
         keyedSummary.dependents.push(parentPath);
       }
 
-      if (!options.skipCacheKeyDependencyChecks) {
+      if (!options.skipCacheKeyDependencyChecks && addon.dependencies) {
         const version = cacheKeyDependencyVersion(addon.dependencies(), addon.root);
         if (version && !validateCacheKeyDependency(version)) {
           summary.errors.push(`The addon '${name}' has a dependency on 'calculate-cache-key-for-tree@${version}'. Update to v1.2.3 or later to avoid unnecessary addon duplication.`);
