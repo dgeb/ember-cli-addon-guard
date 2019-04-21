@@ -2,6 +2,7 @@ export interface AddonGuardConfig {
   skipBuildChecks?: boolean;
   skipCacheKeyDependencyChecks?: boolean;
   ignoreAddons?: string[];
+  namespaceAddons?: string[];
 }
 
 export interface Dict<T = unknown> {
@@ -15,6 +16,7 @@ export interface AddonVersionSummary {
   dependents: path[];
   cacheKey?: string;
   runtime?: boolean;
+  instances?: any[];
 }
 
 export type AddonSummary = Dict<AddonVersionSummary>;

@@ -15,7 +15,7 @@ my-app
     └── ember-wormhole@0.5.1
 ```
 
-Your package manager notices the conflicting version requirements for `ember-wormhole` and helpfully makes sure each addon gets the version it's asking for. But your final built application will only have one copy of `ember-wormhole`—which version will it be?
+Your package manager notices the conflicting version requirements for `ember-wormhole` and helpfully makes sure each addon gets the version it's asking for. But your final built application will only have one copy of `ember-wormhole` — which version will it be?
 
 `ember-cli`'s current build process will merge both versions together, with files from one version clobbering files from the other whenever they have the same name. This also means either `ember-modal-dialog` or `ember-power-select` will wind up attempting to use a version of `ember-wormhole` that it's not expecting, which can lead to anything from hard exceptions to subtle behavioral bugs.
 
@@ -23,7 +23,7 @@ In the scenario described above, the version conflict arose because of adding a 
 
 ## Solution
 
-As with any problem, the first step towards a solution is identifying the problem. By default, `ember-cli-addon-guard` runs prior to every build and checks the full dependency tree for duplicate addons of different versions.  Any cases of addon duplication will be examined to see if the addons introduce run-time code. If a run-time duplication conflict is found, the problem will be logged in detail and a hard error will prevent the build from proceeding until conflicts have been resolved.
+As with any problem, the first step towards a solution is identifying the problem. By default, `ember-cli-addon-guard` runs prior to every build and checks the full dependency tree for duplicate addons of different versions.  Any cases of addon duplication will be examined to see if the addons introduce browser run-time code. If a run-time duplication conflict is found, the problem will be logged in detail and a hard error will prevent the build from proceeding until conflicts have been resolved.
 
 Once a build has been blocked, what's the best way to resolve dependency conflicts? Let's say that multiple versions of `ember-wormhole` have been identified. To avoid these problems "manually", you could take one of the following steps:
 
@@ -32,13 +32,15 @@ Once a build has been blocked, what's the best way to resolve dependency conflic
 
 You can also take a more automated approach to remove duplicate packages across your entire project. If you're using `yarn` as your package manager, consider using [yarn-deduplicate](https://github.com/atlassian/yarn-deduplicate).
 
+`ember-cli-addon-guard` also offers its own (_experimental!_) solution to this problem: namespacing. Namespacing allows multiple versions of a single addon to co-exist in the same project without clobbering each other. You must explicitly opt-in to namespacing via the `namespaceAddons` array in your config file (see below). Namespacing should be used with caution and tested thoroughly.
+
 As a last resort, if duplication of a specific addon is truly not an issue for your application, you can choose to explicitly ignore addons via the `ignoreAddons` array in your config file (see below).
 
-### Run-time vs. Build-time Addons
+### Browser-run-time vs. Build-time-only Addons
 
 Some addons don't actually add files to your application tree, so they don't have the conflict problem described above. In fact, for some addons (like preprocessors such as ember-cli-babel), insisting on a single version is undesirable. Different addons your app uses should be able to compile using whatever tooling they like without conflicting with one another.
 
-For this reason, `ember-cli-addon-guard` is only concerned with preventing multiple versions of _run-time_ dependencies from co-existing in a project. In order to determine whether an addon contains run-time code, it's checked to see if it contains `addon`, `app`, or `src` directories.
+For this reason, `ember-cli-addon-guard` is only concerned with preventing multiple versions of _browser-run-time_ dependencies from co-existing in a project. In order to determine whether an addon contains browser-run-time code, it's checked to see if it contains `addon`, `app`, or `src` directories.
 
 ### Cache-keys vs. Versions
 
@@ -77,6 +79,24 @@ Other configuration options include:
 * `skipBuildChecks: true` - specify if you only want to run `ember-cli-addon-guard` via its CLI, and not during every build.
 
 * `skipCacheKeyDependencyChecks: true` - skip the cache-key dependency checks mentioned above.
+
+### EXPERIMENTAL: Namespacing
+
+_IMPORTANT: The namespacing feature should be considered experimental, used with caution, and thoroughly tested._
+
+In order to try the experimental namespacing feature of `ember-cli-addon-guard`, list any addons you'd like namespaced in the `namespaceAddons` member of your configuration file:
+
+```js
+// config/addon-guard.js
+module.exports = {
+  namespaceAddons: [
+    'ember-yolo',
+    'ember-wat'
+  ]
+};
+```
+
+How does namespacing work? As described above, every unique instance of an addon can identified via its cache-key. Namespacing inserts this cache-key in the path of every module provided by the namespaced addon, and all imports from those modules are adjusted accordingly. Furthermore, namespacing must also be applied to resolvable elements in templates, such as helpers and components. This last portion feels like a clear boundary violation that, thankfully, should be unnecssary once template imports are introduced in the next edition of Ember. For now, please be aware that there are some edge cases that simply don't work yet with namespacing - such as using the `component` helper to dynamically invoke a namespaced component.
 
 ## History and Attribution
 

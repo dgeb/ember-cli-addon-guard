@@ -22,5 +22,12 @@ module.exports = {
    * completely ignore while it's checking for problems.
    */
   ignoreAddons: [
+  ],
+
+  /**
+   * List the names of any addons that you want ember-cli-addon-guard to
+   * namespace if it encounters multiple versions.
+   */
+  namespaceAddons: [
   ]
 };
