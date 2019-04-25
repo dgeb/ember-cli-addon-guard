@@ -9,6 +9,11 @@ export interface ReviewProjectOptions {
   ignoreAddons?: string[];
 
   /**
+   * An array of addon names to namespace (if multiple versions are identified)
+   */
+  namespaceAddons?: string[];
+
+  /**
    * Only return addons with > 1 version?
    */
   conflictsOnly?: boolean;
@@ -44,7 +49,7 @@ export interface ReviewProjectOptions {
  *  }
  */
 export default function reviewProject(project: any, options: ReviewProjectOptions = {}): ProjectSummary {
-  // TODO const toNamespace = [].concat(config.namespaceAddons || []);
+  options.namespaceAddons = options.namespaceAddons || [];
   options.ignoreAddons = IGNORED_ADDONS.concat(options.ignoreAddons || []);
 
   const addons = {};
@@ -92,6 +97,10 @@ function traverseAddons(parentPath: string[], addons: any, summary: ProjectSumma
           dependents: []
         });
         keyedSummary.dependents.push(parentPath);
+        if (options.namespaceAddons.includes(name)) {
+          keyedSummary.instances = keyedSummary.instances || [];
+          keyedSummary.instances.push(addon);
+        }
       }
 
       if (!options.skipCacheKeyDependencyChecks && addon.dependencies) {
