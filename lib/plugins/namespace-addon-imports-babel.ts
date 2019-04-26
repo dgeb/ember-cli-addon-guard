@@ -11,7 +11,7 @@ function namespacePath(path, state) {
   let namespacedPath;
 
   // Ignore any packages we're not targetting
-  if (!source.startsWith(name)) {
+  if (source !== name && !source.startsWith(`${name}/`) ) {
     return;
 
   // Use custom handling for template paths, which need to have `templates`
