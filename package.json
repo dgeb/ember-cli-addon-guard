@@ -19,6 +19,7 @@
     "test": "mocha --require ts-node/register tests/{unit,acceptance}/**/*-test.ts",
     "prepare": "tsc",
     "watch": "tsc --watch",
+    "prepublishOnly": "npm run clean",
     "clean": "git clean -x -f"
   },
   "dependencies": {
