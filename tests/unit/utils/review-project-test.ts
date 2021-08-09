@@ -330,6 +330,38 @@ describe('Unit: reviewProject', function() {
     });
   });
 
+  it('can ignore addons with different cachekey but same versions', function() {
+    const fixturifyProject = new FixturifyProject('root', '0.0.0');
+    fixturifyProject.addDevDependency('ember-cli', '*');
+    fixturifyProject.addAddon('foo', '2.0.1');
+    fixturifyProject.addAddon('bar', '1.0.0', a => {
+      a.addAddon('foo', '2.0.1', () => {}, 'foo2.0.1-nonroot');
+      a.addAddon('baz', '1.0.3');
+    });
+    fixturifyProject.addAddon('baz', '1.0.0');
+    const project = fixturifyProject.buildProjectModel();
+
+    expect(reviewProject(project, { conflictsOnly: true })).to.deep.equal({
+      addons: {
+        baz: {
+          'baz:1.0.0': {
+            version: '1.0.0',
+            cacheKey: 'baz:1.0.0',
+            runtime: false,
+            dependents: [['root']]
+          },
+          'baz:1.0.3': {
+            version: '1.0.3',
+            cacheKey: 'baz:1.0.3',
+            runtime: false,
+            dependents: [['root', 'bar']]
+          },
+        },
+      },
+      errors: []
+    });
+  });
+
   it('will verify that the project dependency calculate-cache-key-for-tree is updated', function() {
     const fixturifyProject = new FixturifyProject('root', '0.0.0');
     fixturifyProject.addDependency('calculate-cache-key-for-tree', '2.0.0');

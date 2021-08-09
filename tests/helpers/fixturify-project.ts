@@ -11,9 +11,10 @@ class ProjectWithoutInternalAddons extends Project {
   }
 }
 
-function prepareAddon(addon: any) {
+function prepareAddon(addon: any, cacheKeyForTree: string) {
   addon.pkg.keywords.push('ember-addon');
   addon.pkg['ember-addon'] = { };
+  addon.pkg['cacheKey'] = cacheKeyForTree;
   addon.files['index.js'] = 'module.exports = { name: require("./package").name };';
 }
 
@@ -53,9 +54,9 @@ export default class EmberCLIFixturifyProject extends FixturifyProject {
     return project;
   }
 
-  addAddon(name: string, version = '0.0.0', cb?: (addon: any) => void) {
+  addAddon(name: string, version = '0.0.0', cb?: (addon: any) => void, cacheKeyForTree?: string) {
     return this.addDependency(name, version, addon => {
-      prepareAddon(addon);
+      prepareAddon(addon, cacheKeyForTree);
 
       if (cb) {
         cb(addon);
@@ -63,9 +64,9 @@ export default class EmberCLIFixturifyProject extends FixturifyProject {
     });
   }
 
-  addDevAddon(name: string, version = '0.0.0', cb?: (addon: any) => void) {
+  addDevAddon(name: string, version = '0.0.0', cb?: (addon: any) => void, cacheKeyForTree?: string) {
     return this.addDevDependency(name, version, addon => {
-      prepareAddon(addon);
+      prepareAddon(addon, cacheKeyForTree);
       if (cb) {
         cb(addon);
       }

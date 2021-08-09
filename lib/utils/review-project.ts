@@ -61,7 +61,7 @@ export default function reviewProject(project: any, options: ReviewProjectOption
 
   if (options.conflictsOnly) {
     for (const name in addons) {
-      if (Object.keys(addons[name]).length < 2) {
+      if (Object.keys(addons[name]).length < 2 || isSameVersion(addons[name])) {
         delete addons[name];
       }
     }
@@ -76,6 +76,15 @@ export default function reviewProject(project: any, options: ReviewProjectOption
 
   return summary;
 };
+
+// check for different cache key with the same versions
+function isSameVersion(addon: any) {
+  const versions = new Set();
+  for (const summary in addon) {
+    versions.add(addon[summary].version);
+  }
+  return versions.size === 1;
+}
 
 function traverseAddons(parentPath: string[], addons: any, summary: ProjectSummary, options: ReviewProjectOptions) {
   for (const addon of addons) {
