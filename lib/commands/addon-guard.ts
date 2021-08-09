@@ -52,7 +52,7 @@ module.exports = {
     if (Object.keys(duplicateAddons).length > 0 || summary.errors.length > 0) {
       if (Object.keys(duplicateAddons).length > 0) {
         this.ui.writeLine(chalk.red(chalk.underline('Summary')));
-        this.ui.writeLine(chalk.red(`Number of addons with multiple verions: ${ addonCount }\n`));
+        this.ui.writeLine(chalk.red(`Number of addons with multiple versions: ${ addonCount }\n`));
         for (const name in duplicateAddons) {
           const addonInstances: Dict<AddonVersionSummary> = duplicateAddons[name];
           const versions = new Set();
